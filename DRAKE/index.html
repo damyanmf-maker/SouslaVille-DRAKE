@@ -24,101 +24,444 @@
   <p><button id="idStop">Stop</button></p>
 
   <script>
-    $(document).ready(
-      function () {
-        // écrire le JQuery ici
-        console.log('*** JQuery ' + $.fn.jquery + ' prêt ***')
-        let nom = ''
-        let score = 0
-        let arme = 'aucune'
-        // Fstop
-        var Fstop = function () {
-          $('audio').remove()
-        } //fin Fstop
-        $('#idStop').on('click', Fstop)
+$(document).ready(function () {
 
-        // Fplay
-        var Fplay = function (Pfile) {
-          var oAudio = $('<audio autoplay> <source src="' + Pfile + '"></audio>')
-          $('body').append(oAudio)
-        } //fin Fplay
+    console.log('*** JQuery ' + $.fn.jquery + ' prêt ***')
+
+    let nom = ''
+    let score = 0
+    let arme = 'aucune'
+    let carte = false
+    let blessee = false
+    let amis = 2
+
+    // Fstop
+    let Fstop = function () {
+      $('audio').remove()
+    }
+
+    $('#idStop').on('click', Fstop)
+
+    // Fplay
+    let Fplay = function (Pfile) {
+      let oAudio = $('<audio autoplay><source src="' + Pfile + '"></audio>')
+      $('body').append(oAudio)
+    }
 
 
-        // Fscene2
+    // SCENE 5 : LE NID
 
-        let Fscene2 = function () { // Début Fscene2
-          // Stopper précedents sons
-          Fstop()
-          // Jouer son goutte à remplacer !
-          //Fplay('clairon.mp3')
+    let Fscene5 = function () {
 
-          let shtml = '<div>'
-          shtml += '<h3>Le Local technique </h3>'
-          shtml += '<hr/>'
-          shtml += '<center><img src="etape02.jpg" height="150"></center>'
-          shtml += '<p> Au pied de l\'échelle, un local d\'agents de la ville. Sur l\'établi, trois objets.'
-          shtml += 'Ton téléphone te sert de lampe : tu n\'as qu\'une main libre, tu n\'en prends qu\'un.</p>'
-          shtml += '</div>'
+      Fstop()
 
-          let oBouton = {
-            'Prendre la machette': function () { arme = 'machette'; $(this).on('dialogclose', Fscene1).dialog('close').dialog('destroy').remove() },
-            'Prendre la fusée': function () { arme = 'fusee'; $(this).on('dialogclose', Fscene1).dialog('close').dialog('destroy').remove() },
-            'Prendre le pied de biche': function () { arme = 'pied'; $(this).on('dialogclose', Fscene1).dialog('close').dialog('destroy').remove() },
+      let shtml = '<div>'
+      shtml += '<h3>Le nid</h3>'
+      shtml += '<hr/>'
+      shtml += '<center><img src="etape05.jpg" height="150"></center>'
+      shtml += '<p>Vous entrez dans une galerie sombre.</p>'
+      shtml += '<p>Un nid étrange bloque le passage.</p>'
+      shtml += '<p>Vous entendez quelque chose bouger derrière les débris.</p>'
+      shtml += '<p>Que décides-tu ?</p>'
+      shtml += '</div>'
 
+      let oBouton = {
+
+        'Fouiller': function () {
+
+          let sfin = '<div>'
+          sfin += '<h3>Mission échouée</h3>'
+          sfin += '<p>' + $('<div>').text(nom).html() + ', tu as été repéré.</p>'
+          sfin += '<p>La mission est terminée.</p>'
+          sfin += '<p>Score : ' + score + ' points</p>'
+          sfin += '</div>'
+
+          $(this).dialog('close').dialog('destroy').remove()
+
+          let oFin = {
+            buttons: {
+              'Recommencer': function () {
+                $(this).on('dialogclose', Fscene0)
+                  .dialog('close').dialog('destroy').remove()
+              },
+              'Fin': function () {
+                $(this).dialog('close').dialog('destroy').remove()
+              }
+            },
+            title: 'Défaite'
           }
 
-          let oOption = {
-            buttons: oBouton,
-            title: 'Sous la ville ',
-            width: 520,
-            show: { effect: 'blind' }
+          $(sfin).dialog(oFin)
+        },
+
+        'Continuer sans bruit': function () {
+          score += 10
+
+          let sfin = '<div>'
+          sfin += '<h3>Fin de cette partie</h3>'
+          sfin += '<p>Tu as réussi à passer sans faire de bruit.</p>'
+          sfin += '<p>Score : ' + score + ' points</p>'
+          sfin += '</div>'
+
+          $(this).dialog('close').dialog('destroy').remove()
+
+          $(sfin).dialog({
+            buttons: {
+              'Recommencer': function () {
+                $(this).on('dialogclose', Fscene0)
+                  .dialog('close').dialog('destroy').remove()
+              },
+              'Fin': function () {
+                $(this).dialog('close').dialog('destroy').remove()
+              }
+            },
+            title: 'Sous la ville'
+          })
+        },
+
+        'Retourner aux tunnels': function () {
+          $(this).on('dialogclose', Fscene3)
+            .dialog('close').dialog('destroy').remove()
+        }
+
+      }
+
+      let oOption = {
+        buttons: oBouton,
+        title: 'Étape 5 - Le nid',
+        width: 540,
+        show: { effect: 'blind' }
+      }
+
+      $(shtml).dialog(oOption)
+
+    } // fin Fscene5
+
+
+    // SCENE 4 : LE COLLECTEUR
+
+    let Fscene4 = function () {
+
+      Fstop()
+      Fplay('splash.mp3')
+
+      let shtml = '<div>'
+      shtml += '<h3>Le collecteur</h3>'
+      shtml += '<hr/>'
+      shtml += '<center><img src="etape04.jpg" height="150"></center>'
+      shtml += '<p>Vous arrivez dans un collecteur rempli d’eau.</p>'
+      shtml += '<p>Une carte magnétique flotte près du bord.</p>'
+      shtml += '<p>Cette carte pourrait ouvrir une porte plus loin.</p>'
+      shtml += '<p>Que choisis-tu ?</p>'
+      shtml += '</div>'
+
+      let oBouton = {
+
+        'Récupérer la carte': function () {
+          carte = true
+          score += 20
+
+          let sfin = '<div>'
+          sfin += '<h3>Carte récupérée !</h3>'
+          sfin += '<p>Tu as récupéré la carte magnétique.</p>'
+          sfin += '<p>Score : ' + score + ' points</p>'
+          sfin += '</div>'
+
+          $(this).dialog('close').dialog('destroy').remove()
+
+          $(sfin).dialog({
+            buttons: {
+              'Retourner aux tunnels': function () {
+                $(this).on('dialogclose', Fscene3)
+                  .dialog('close').dialog('destroy').remove()
+              },
+              'Recommencer': function () {
+                $(this).on('dialogclose', Fscene0)
+                  .dialog('close').dialog('destroy').remove()
+              }
+            },
+            title: 'Sous la ville'
+          })
+        },
+
+        'Continuer sans carte': function () {
+
+          let sfin = '<div>'
+          sfin += '<h3>Tu continues sans la carte.</h3>'
+          sfin += '<p>Tu devras trouver un autre moyen de progresser.</p>'
+          sfin += '</div>'
+
+          $(this).dialog('close').dialog('destroy').remove()
+
+          $(sfin).dialog({
+            buttons: {
+              'Retourner aux tunnels': function () {
+                $(this).on('dialogclose', Fscene3)
+                  .dialog('close').dialog('destroy').remove()
+              },
+              'Recommencer': function () {
+                $(this).on('dialogclose', Fscene0)
+                  .dialog('close').dialog('destroy').remove()
+              }
+            },
+            title: 'Sous la ville'
+          })
+        },
+
+        'Retourner aux tunnels': function () {
+          $(this).on('dialogclose', Fscene3)
+            .dialog('close').dialog('destroy').remove()
+        }
+
+      }
+
+      let oOption = {
+        buttons: oBouton,
+        title: 'Étape 4 - Le collecteur',
+        width: 540,
+        show: { effect: 'blind' }
+      }
+
+      $(shtml).dialog(oOption)
+
+    } // fin Fscene4
+
+
+    // SCENE 3 : LES TROIS TUNNELS
+
+    let Fscene3 = function () {
+
+      Fstop()
+      Fplay('wind.mp3')
+
+      let shtml = '<div>'
+      shtml += '<h3>Les trois tunnels</h3>'
+      shtml += '<hr/>'
+      shtml += '<center><img src="etape03.jpg" height="150"></center>'
+      shtml += '<p>Trois passages s’ouvrent devant vous.</p>'
+      shtml += '<p>À gauche, un tunnel inondé.</p>'
+      shtml += '<p>À droite, un bruit étrange résonne.</p>'
+      shtml += '<p>Quel passage choisissez-vous ?</p>'
+      shtml += '</div>'
+
+      let oBouton = {
+
+        'Gauche': function () {
+          score += 5
+
+          $(this).on('dialogclose', Fscene4)
+            .dialog('close').dialog('destroy').remove()
+        },
+
+        'Droite': function () {
+
+          $(this).on('dialogclose', Fscene5)
+            .dialog('close').dialog('destroy').remove()
+        }
+
+      }
+
+      let oOption = {
+        buttons: oBouton,
+        title: 'Étape 3 - Les trois tunnels',
+        width: 540,
+        show: { effect: 'blind' }
+      }
+
+      $(shtml).dialog(oOption)
+
+    } // fin Fscene3
+
+
+    // SCENE 2 : LE LOCAL TECHNIQUE
+
+    let Fscene2 = function () {
+
+      Fstop()
+      Fplay('splash.mp3')
+
+      let shtml = '<div>'
+      shtml += '<h3>Le local technique</h3>'
+      shtml += '<hr/>'
+      shtml += '<center><img src="etape02.jpg" height="150"></center>'
+      shtml += '<p>Vous découvrez un ancien local technique.</p>'
+      shtml += '<p>Sur un établi, trois objets sont disponibles.</p>'
+      shtml += '<p>Tu ne peux en prendre qu’un seul.</p>'
+      shtml += '</div>'
+
+      let oBouton = {
+
+        'Prendre la machette': function () {
+          arme = 'machette'
+          score += 10
+
+          $(this).on('dialogclose', Fscene3)
+            .dialog('close').dialog('destroy').remove()
+        },
+
+        'Prendre la fusée': function () {
+          arme = 'fusée'
+          score += 10
+
+          $(this).on('dialogclose', Fscene3)
+            .dialog('close').dialog('destroy').remove()
+        },
+
+        'Prendre le pied-de-biche': function () {
+          arme = 'pied-de-biche'
+          score += 10
+
+          $(this).on('dialogclose', Fscene3)
+            .dialog('close').dialog('destroy').remove()
+        },
+
+        'Ne rien prendre': function () {
+          arme = 'aucun objet'
+
+          $(this).on('dialogclose', Fscene3)
+            .dialog('close').dialog('destroy').remove()
+        }
+
+      }
+
+      let oOption = {
+        buttons: oBouton,
+        title: 'Étape 2 - Le local technique',
+        width: 540,
+        show: { effect: 'blind' }
+      }
+
+      $(shtml).dialog(oOption)
+
+    } // fin Fscene2
+
+
+    // SCENE 1 : LA PLAQUE D'EGOUT
+
+    let Fscene1 = function () {
+
+      Fstop()
+
+      let shtml = '<div>'
+      shtml += '<h3>La plaque d’égout</h3>'
+      shtml += '<hr/>'
+      shtml += '<center><img src="etape01.jpg" height="150"></center>'
+      shtml += '<p>23 h 47. Léo a disparu depuis trois jours.</p>'
+      shtml += '<p>Le dernier signal de son téléphone vient d’ici.</p>'
+      shtml += '<p>Inès tient la lampe, Malik la corde.</p>'
+      shtml += '<p>La plaque d’égout est entrouverte.</p>'
+      shtml += '<p>Que décides-tu ?</p>'
+      shtml += '</div>'
+
+      let oBouton = {
+
+        'Descendre': function () {
+          score += 10
+
+          $(this).on('dialogclose', Fscene2)
+            .dialog('close').dialog('destroy').remove()
+        },
+
+        'Rentrer chez toi': function () {
+
+          let sfin = '<div>'
+          sfin += '<h3>Abandon de la mission</h3>'
+          sfin += '<p>' + $('<div>').text(nom).html() + ', tu décides de rentrer chez toi.</p>'
+          sfin += '<p>Léo reste introuvable.</p>'
+          sfin += '<p>Score : ' + score + ' points</p>'
+          sfin += '</div>'
+
+          $(this).dialog('close').dialog('destroy').remove()
+
+          $(sfin).dialog({
+            buttons: {
+              'Recommencer': function () {
+                $(this).on('dialogclose', Fscene0)
+                  .dialog('close').dialog('destroy').remove()
+              },
+              'Fin': function () {
+                $(this).dialog('close').dialog('destroy').remove()
+              }
+            },
+            title: 'Abandon'
+          })
+        }
+
+      }
+
+      let oOption = {
+        buttons: oBouton,
+        title: 'Étape 1 - La plaque d’égout',
+        width: 540,
+        show: { effect: 'clip' }
+      }
+
+      $(shtml).dialog(oOption)
+
+    } // fin Fscene1
+
+
+    // SCENE 0 : PRENOM DU JOUEUR
+
+    let Fscene0 = function () {
+
+      Fstop()
+
+      let shtml = '<div>'
+      shtml += '<h3>Bienvenue dans Sous la ville !</h3>'
+      shtml += '<hr/>'
+      shtml += '<center><img src="Gemini_Generated_Image_kijiyrkijiyrkiji.jpg" height="150"></center>'
+      shtml += '<p>Léo a disparu sous la ville.</p>'
+      shtml += '<p>Entre ton prénom pour commencer :</p>'
+      shtml += '<input type="text" id="idNom" placeholder="Ton prénom">'
+      shtml += '<p id="idErreur" style="color:red"></p>'
+      shtml += '</div>'
+
+      let oBouton = {
+
+        'Commencer': function () {
+
+          nom = $('#idNom').val().trim()
+
+          if (nom == '') {
+            $('#idErreur').text('Entre ton prénom !')
+          }
+          else {
+
+            score = 0
+            arme = 'aucune'
+            carte = false
+            blessee = false
+            amis = 2
+
+            $(this).on('dialogclose', Fscene1)
+              .dialog('close').dialog('destroy').remove()
           }
 
-          $(shtml).dialog(oOption)
-        } // fin Fscene2
+        }
+
+      }
+
+      let oOption = {
+        buttons: oBouton,
+        title: 'Sous la ville',
+        width: 540,
+        modal: true,
+        show: { effect: 'blind' }
+      }
+
+      $(shtml).dialog(oOption)
+
+    } // fin Fscene0
 
 
+    // DEMARRAGE
 
-        // Debut de Fscene1 
-        let Fscene1 = function () { // début Fscene1
+    Fscene0()
 
-          // Stopper le son 
-          Fstop()
-          // Jouer le son d'ambiance pas encore de fichier 
-
-          let shtml = '<div>'
-          shtml += '<h3>La Plaque D\'égout</h3>'
-          shtml += '<hr/>'
-          shtml += '<center><img src="etape01.jpg" height="150"></center>'
-          shtml += '<p> 23 h 47. Léo a disparu depuis trois jours. Le dernier signal de son téléphone vient d\'ici, sous la place. '
-          shtml += 'Inès tient la lampe, Malik la corde. La plaque est déjà entrouverte.</p>'
-          shtml += '</div>'
-
-
-          let oBouton = {
-            'Descendre': function () { $(this).on('dialogclose', Fscene2).dialog('close').dialog('destroy').remove() }, 
-            'Rentrer chez toi': function () { $(this).dialog('close').dialog('destroy').remove() }
-          }
-
-          let oOption = {
-            buttons: oBouton,
-            title: 'Sous la ville',
-            width: 520,
-            show: { effect: 'clip' }
-          }
-
-          $(shtml).dialog(oOption)
-
-
-
-        }// fin Fscene1
-        // Invoquer Fscene1 pour démarrer le jeu
-        Fscene1()
-
-
-      })// fin du JQuery
+  })
 
   </script>
-</body>
 
+</body>
 </html>
