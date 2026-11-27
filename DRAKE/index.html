@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Sous la ville</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css">
+
+  <!-- JQuery téléchargement -->
+  <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+  <script src="https://unpkg.com/jquery-ui/dist/jquery-ui.min.js"></script>
+
+  <!-- adapter le thème choisir :  -->
+  <link rel="stylesheet" href="https://unpkg.com/jquery-ui/dist/themes/ui-darkness/jquery-ui.min.css">
+
+  <!-- ajouter balise de style -->
+  <link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body>
+
+  <p><button id="idStop">Stop</button></p>
+
+  <script>
+    $(document).ready(
+      function () {
+        // écrire le JQuery ici
+        console.log('*** JQuery ' + $.fn.jquery + ' prêt ***')
+        let nom = ''
+        let score = 0
+        let arme = 'aucune'
+        // Fstop
+        var Fstop = function () {
+          $('audio').remove()
+        } //fin Fstop
+        $('#idStop').on('click', Fstop)
+
+        // Fplay
+        var Fplay = function (Pfile) {
+          var oAudio = $('<audio autoplay> <source src="' + Pfile + '"></audio>')
+          $('body').append(oAudio)
+        } //fin Fplay
+
+
+        // Fscene2
+
+        let Fscene2 = function () { // Début Fscene2
+          // Stopper précedents sons
+          Fstop()
+          // Jouer son goutte à remplacer !
+          //Fplay('clairon.mp3')
+
+          let shtml = '<div>'
+          shtml += '<h3>Le Local technique </h3>'
+          shtml += '<hr/>'
+          shtml += '<center><img src="etape02.jpg" height="150"></center>'
+          shtml += '<p> Au pied de l\'échelle, un local d\'agents de la ville. Sur l\'établi, trois objets.'
+          shtml += 'Ton téléphone te sert de lampe : tu n\'as qu\'une main libre, tu n\'en prends qu\'un.</p>'
+          shtml += '</div>'
+
+          let oBouton = {
+            'Prendre la machette': function () { arme = 'machette'; $(this).on('dialogclose', Fscene1).dialog('close').dialog('destroy').remove() },
+            'Prendre la fusée': function () { arme = 'fusee'; $(this).on('dialogclose', Fscene1).dialog('close').dialog('destroy').remove() },
+            'Prendre le pied de biche': function () { arme = 'pied'; $(this).on('dialogclose', Fscene1).dialog('close').dialog('destroy').remove() },
+
+          }
+
+          let oOption = {
+            buttons: oBouton,
+            title: 'Sous la ville ',
+            width: 520,
+            show: { effect: 'blind' }
+          }
+
+          $(shtml).dialog(oOption)
+        } // fin Fscene2
+
+
+
+        // Debut de Fscene1 
+        let Fscene1 = function () { // début Fscene1
+
+          // Stopper le son 
+          Fstop()
+          // Jouer le son d'ambiance pas encore de fichier 
+
+          let shtml = '<div>'
+          shtml += '<h3>La Plaque D\'égout</h3>'
+          shtml += '<hr/>'
+          shtml += '<center><img src="etape01.jpg" height="150"></center>'
+          shtml += '<p> 23 h 47. Léo a disparu depuis trois jours. Le dernier signal de son téléphone vient d\'ici, sous la place. '
+          shtml += 'Inès tient la lampe, Malik la corde. La plaque est déjà entrouverte.</p>'
+          shtml += '</div>'
+
+
+          let oBouton = {
+            'Descendre': function () { $(this).on('dialogclose', Fscene2).dialog('close').dialog('destroy').remove() }, 
+            'Rentrer chez toi': function () { $(this).dialog('close').dialog('destroy').remove() }
+          }
+
+          let oOption = {
+            buttons: oBouton,
+            title: 'Sous la ville',
+            width: 520,
+            show: { effect: 'clip' }
+          }
+
+          $(shtml).dialog(oOption)
+
+
+
+        }// fin Fscene1
+        // Invoquer Fscene1 pour démarrer le jeu
+        Fscene1()
+
+
+      })// fin du JQuery
+
+  </script>
+</body>
+
+</html>
